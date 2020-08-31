@@ -174,6 +174,7 @@
         EggTap.prototype._initApp = function () {
             var _this = this;
             this.app = new PIXI.Application({
+                autoDensity: true,
                 resolution: devicePixelRatio
             });
             // event
@@ -212,7 +213,7 @@
             this.appBackground = new PIXI.Graphics()
                 .beginFill(this.colors[0], 1)
                 .drawRegularPolygon(0, 0, 2 * Math.max(this.app.screen.width, this.app.screen.height), 4, 0);
-            // seems there is no displayGroup specified yet
+            // seems there is no displayGroup specified
             this.appBackground.displayGroup = this.botGroup;
             this.app.stage.addChild(this.appBackground);
         };
@@ -248,7 +249,6 @@
                 row = 8;
                 col = 4;
             }
-            document.createElement('div');
             var width = this.appWrapper.clientWidth / col;
             var height = this.appWrapper.clientHeight / row;
             var _loop_1 = function (r) {
