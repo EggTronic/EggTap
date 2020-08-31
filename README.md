@@ -11,6 +11,7 @@
 ```
 
 #### 🙈 todo
+- [ ] loading display
 - [ ] auto adjust on window resizing
 - [ ] live server plugin for development
 - [ ] Add more animations
