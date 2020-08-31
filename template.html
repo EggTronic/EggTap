@@ -1,0 +1,52 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>EggTronic's WarmaTap</title>
+  <meta name="description" content="EggTronic's WarmaTap">
+  <meta name="author" content="WarmaTap">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.3/pixi.min.js" integrity="sha512-J7UHpLx39bpqtP+aWP6yIuXroFk0XPkDQaS9zDthM4TVeaXstWYh556gxsXwwIwpAPSoKqVHW+eqz3B93SpyKg==" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi-layers@0.3.1/dist/pixi-layers.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@pixi/graphics-extras@5.3.3/dist/graphics-extras.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi-sound@3.0.5/dist/pixi-sound.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js" integrity="sha512-IQLehpLoVS4fNzl7IfH8Iowfm5+RiMGtHykgZJl9AWMgqx0AmJ6cRWcB+GaGVtIsnC4voMfm8f2vwtY+6oPjpQ==" crossorigin="anonymous"></script>
+  <style>
+    body{
+      margin: 0;
+      padding: 0;
+    }
+    #eggtap {
+      height: 100vh;
+      width: 100vw;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="eggtap"> </div>
+  <script src="index.js"></script>
+  <script>
+    window.addEventListener('load', (event) => {
+      var args = [
+            `\n %c %c %c WarmaTap - ✰ EggTronic ✰  %c  %c  https://eggtronic.github.io/  %c %c ♥%c♥%c♥ \n\n`,
+            'background: #88CCCC; padding:5px 0;',
+            'background: #88CCCC; padding:5px 0;',
+            'color: #88CCCC; background: #030307; padding:5px 0;',
+            'background: #88CCCC; padding:5px 0;',
+            'background: #88CCCC; padding:5px 0;',
+            'background: #88CCCC; padding:5px 0;',
+            'color: #88CCCC; background: #fff; padding:5px 0;',
+            'color: #88CCCC; background: #fff; padding:5px 0;',
+            'color: #88CCCC; background: #fff; padding:5px 0;',
+      ];
+      console.log(...args);
+      var container = document.getElementById("eggtap");
+      new EggTap.EggTapApp(container, EggTap.EggTapColors, EggTap.EggTapAnimations)
+    });
+    
+  </script>
+</body>
+</html>

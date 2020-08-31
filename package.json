@@ -1,0 +1,41 @@
+{
+  "name": "EggTap",
+  "version": "0.0.1",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
+    "deploy": "gh-pages -d build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EggTronic/EggTap.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EggTronic/EggTap/issues"
+  },
+  "homepage": "https://github.com/EggTronic/EggTap#readme",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^5.0.2",
+    "@rollup/plugin-url": "^5.0.1",
+    "@types/pixi.js": "^5.0.0",
+    "gh-pages": "^3.1.0",
+    "rollup": "^2.26.8",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-generate-html-template": "^1.7.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "tslib": "^2.0.1",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "@pixi/graphics-extras": "^5.3.3",
+    "gsap": "^3.5.1",
+    "pixi-layers": "^0.3.1",
+    "pixi-sound": "^3.0.5",
+    "pixi.js": "^5.3.3"
+  }
+}
