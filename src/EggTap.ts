@@ -74,6 +74,7 @@ export default class EggTap {
 
   _initApp() {
     this.app = new PIXI.Application({
+      autoDensity: true,
       resolution: devicePixelRatio
     });
 
@@ -121,7 +122,7 @@ export default class EggTap {
       .beginFill(this.colors[0], 1)
       .drawRegularPolygon(0, 0, 2 * Math.max(this.app.screen.width, this.app.screen.height), 4, 0);
     
-    // seems there is no displayGroup specified yet
+    // seems there is no displayGroup specified
     (this.appBackground as any).displayGroup = this.botGroup;
     this.app.stage.addChild(this.appBackground)
   }
@@ -131,6 +132,7 @@ export default class EggTap {
     const resize = () => {
       // Get the p
       if (!this.app) throw new Error('fail to get app instance');
+
       if (!parent) throw new Error('fail to get parent node');
       // Resize the renderer
       this.app.renderer.resize(
@@ -163,7 +165,7 @@ export default class EggTap {
       row = 8;
       col = 4;
     }
-    document.createElement('div');
+    
     const width = this.appWrapper.clientWidth / col;
     const height = this.appWrapper.clientHeight / row;
 
