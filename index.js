@@ -132,9 +132,14 @@
         'k32': k10
     };
 
+    var Layout;
+    (function (Layout) {
+        Layout[Layout["Portrait"] = 0] = "Portrait";
+        Layout[Layout["Landscape"] = 1] = "Landscape";
+    })(Layout || (Layout = {}));
     var EggTap = /** @class */ (function () {
         function EggTap(wrapper, colors, animations, customAudiosSlices, customBgm) {
-            this.appWrapper = wrapper;
+            this.appWrapper = document.getElementById(wrapper);
             this.colors = colors;
             this.animations = animations;
             this.audioSlices = customAudiosSlices ? customAudiosSlices : audioSlices;
@@ -152,7 +157,7 @@
             this.currentBgColorIndex = 0;
             this.currentTarget = '';
             this.isPressed = false;
-            this.layout = 'horizontal'; // or vertical
+            this.layout = Layout.Landscape;
             this.currentTime = 0;
             this.offset = -0.56;
             this.interval = 0.125 / 2;
@@ -210,8 +215,12 @@
         EggTap.prototype._initBackground = function () {
             if (!this.app)
                 throw new Error('fail to get app instance');
+            // reset
+            if (this.appBackground) {
+                this.app.stage.removeChild(this.appBackground);
+            }
             this.appBackground = new PIXI.Graphics()
-                .beginFill(this.colors[0], 1)
+                .beginFill(this.colors[this.currentBgColorIndex], 1)
                 .drawRegularPolygon(0, 0, 2 * Math.max(this.app.screen.width, this.app.screen.height), 4, 0);
             // seems there is no displayGroup specified
             this.appBackground.displayGroup = this.botGroup;
@@ -234,8 +243,20 @@
                 // for (let t of this.tappers) {
                 //   t.position.set(parent.width, parent.height);
                 // } 
-                if (_this.app.screen.width < _this.app.screen.height) {
-                    _this.layout = 'vertical';
+                if (_this.appWrapper.clientWidth < _this.appWrapper.clientHeight) {
+                    _this.layout = Layout.Portrait;
+                }
+                else {
+                    _this.layout = Layout.Landscape;
+                }
+                if (_this.bgmCtx) {
+                    _this._initBackground();
+                    for (var _i = 0, _a = _this.tappers; _i < _a.length; _i++) {
+                        var tapper = _a[_i];
+                        _this.app.stage.removeChild(tapper);
+                    }
+                    _this.tappers = [];
+                    _this._initTaps();
                 }
             };
             // Listen for window resize events
@@ -244,11 +265,20 @@
         };
         EggTap.prototype._initTaps = function () {
             var _this = this;
+            // reset
+            for (var _i = 0, _a = this.tappers; _i < _a.length; _i++) {
+                var tapper = _a[_i];
+                tapper.off('pointerover');
+                tapper.off('pointerdown');
+            }
+            this.tappers = [];
+            // check layout
             var row = 4, col = 8;
-            if (this.layout === 'vertical') {
+            if (this.layout === Layout.Portrait) {
                 row = 8;
                 col = 4;
             }
+            // tapper size
             var width = this.appWrapper.clientWidth / col;
             var height = this.appWrapper.clientHeight / row;
             var _loop_1 = function (r) {
@@ -341,7 +371,7 @@
             if (seed !== Math.floor(Math.random() * this.colors.length))
                 return;
             var heading = Math.random();
-            var radius = this.app.screen.width;
+            var radius = Math.max(this.appWrapper.clientWidth, this.appWrapper.clientHeight);
             var sides = 4;
             var rotate = Math.random() * 360;
             var x = heading >= 0.5 ? -2 * radius : 3 * radius;
@@ -378,7 +408,7 @@
                         if (!resources.bgm)
                             throw new Error('fail to load resources');
                         resources.bgm.sound.loop = true;
-                        resources.bgm.sound.volume = 0.5;
+                        resources.bgm.sound.volume = 0.7;
                         resources.bgm.sound.play();
                         _this.bgmCtx = resources.bgm.sound.context.audioContext;
                         _this._initTaps();
@@ -395,13 +425,10 @@
                 var child = _a[_i];
                 child.off('pointerover');
                 child.off('pointerdown');
-                // child.off('pointerenter');
-                // child.off('touchmove');
-                // child.off('touchend');
-                // child.off('touchstart');
             }
-            // this.appWrapper.removeEventListener('mouseup');
-            // this.appWrapper.removeEventListener('mousedown');
+            // remove all listeners of parent
+            var newWrapper = this.appWrapper.cloneNode(true);
+            this.appWrapper.parentNode.replaceChild(newWrapper, this.appWrapper);
         };
         return EggTap;
     }());
