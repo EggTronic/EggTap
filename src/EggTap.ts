@@ -150,6 +150,9 @@ export default class EggTap {
         this.appWrapper.clientHeight
       );
 
+      this.app.renderer.view.style.width = this.appWrapper.clientWidth + 'px';
+      this.app.renderer.view.style.height = this.appWrapper.clientHeight + 'px';
+
       // You can use the 'screen' property as the renderer visible
       // area, this is more useful than view.width/height because
       // it handles resolution
