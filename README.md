@@ -12,7 +12,7 @@
 
 #### 🙈 todo
 - [ ] loading display
-- [ ] auto adjust on window resizing
+- [x] auto adjust on window resizing
 - [ ] live server plugin for development
 - [ ] Add more animations
 - [ ] Figure out how to match throttle with bpm
