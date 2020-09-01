@@ -7,6 +7,11 @@ import 'gsap';
 import bgm from './assets/audios/warmspace_ins.mp3';
 import { audioSlices } from './assets/index';
 
+enum Layout {
+  Portrait,
+  Landscape
+}
+
 export default class EggTap {
   app: PIXI.Application | null;
   topGroup: PIXI.display.Group | null;
@@ -16,7 +21,7 @@ export default class EggTap {
   midLayer: PIXI.display.Layer | null;
   botLayer: PIXI.display.Layer | null;
   animations: (({ ...AnimationProps }) => void)[];
-  appWrapper: HTMLDivElement;
+  appWrapper: HTMLElement;
   tappers: PIXI.Graphics[];
   colors: number[];
   appBackground: PIXI.Graphics | undefined;
@@ -26,19 +31,19 @@ export default class EggTap {
   bgm: string;
   currentTarget: string;
   isPressed: boolean;
-  layout: 'vertical' | 'horizontal';
+  layout: Layout;
   currentTime: number;
   offset: number;
   interval: number;
   bgmCtx: null | AudioContext;
   constructor(
-    wrapper: HTMLDivElement,
+    wrapper: string,
     colors: number[],
     animations: (({ ...AnimationProps }) => void)[],
     customAudiosSlices?: AudioSlices,
     customBgm?: string
   ) {
-    this.appWrapper = wrapper;
+    this.appWrapper = document.getElementById(wrapper);
     this.colors = colors;
     this.animations = animations;
     this.audioSlices = customAudiosSlices ? customAudiosSlices : audioSlices;
@@ -56,7 +61,7 @@ export default class EggTap {
     this.currentBgColorIndex = 0;
     this.currentTarget = '';
     this.isPressed = false;
-    this.layout = 'horizontal'; // or vertical
+    this.layout = Layout.Landscape;
     this.currentTime = 0;
     this.offset = -0.56;
     this.interval = 0.125 / 2;
@@ -117,9 +122,14 @@ export default class EggTap {
 
   _initBackground() {
     if (!this.app) throw new Error('fail to get app instance');
+    
+    // reset
+    if (this.appBackground) {
+      this.app.stage.removeChild(this.appBackground);
+    }
 
     this.appBackground = new PIXI.Graphics()
-      .beginFill(this.colors[0], 1)
+      .beginFill(this.colors[this.currentBgColorIndex], 1)
       .drawRegularPolygon(0, 0, 2 * Math.max(this.app.screen.width, this.app.screen.height), 4, 0);
     
     // seems there is no displayGroup specified
@@ -147,10 +157,20 @@ export default class EggTap {
       //   t.position.set(parent.width, parent.height);
       // } 
 
-      if (this.app.screen.width < this.app.screen.height) {
-        this.layout = 'vertical';
+      if (this.appWrapper.clientWidth < this.appWrapper.clientHeight) {
+        this.layout = Layout.Portrait;
+      } else {
+        this.layout = Layout.Landscape;
       }
 
+      if (this.bgmCtx) {
+        this._initBackground();
+        for (let tapper of this.tappers) {
+          this.app.stage.removeChild(tapper);
+        }
+        this.tappers = [];
+        this._initTaps();
+      }
     }
 
     // Listen for window resize events
@@ -160,12 +180,21 @@ export default class EggTap {
   }
 
   _initTaps() {
+    // reset
+    for (let tapper of this.tappers) {
+      tapper.off('pointerover');
+      tapper.off('pointerdown');
+    }
+    this.tappers = [];
+
+    // check layout
     let row = 4, col = 8;
-    if (this.layout === 'vertical') {
+    if (this.layout === Layout.Portrait) {
       row = 8;
       col = 4;
     }
     
+    // tapper size
     const width = this.appWrapper.clientWidth / col;
     const height = this.appWrapper.clientHeight / row;
 
@@ -266,7 +295,10 @@ export default class EggTap {
 
     if (seed !== Math.floor(Math.random() * this.colors.length)) return;
     const heading = Math.random();
-    const radius = (this.app as PIXI.Application).screen.width;
+    const radius = Math.max(
+      this.appWrapper.clientWidth,
+      this.appWrapper.clientHeight
+    );
     const sides = 4;
     const rotate = Math.random() * 360;
     const x = heading >= 0.5 ? -2 * radius : 3 * radius;
@@ -309,7 +341,7 @@ export default class EggTap {
     PIXI.Loader.shared.load((loader, resources) => {
       if (!resources.bgm) throw new Error('fail to load resources');
       resources.bgm.sound.loop = true;
-      resources.bgm.sound.volume = 0.5;
+      resources.bgm.sound.volume = 0.7;
 
       resources.bgm.sound.play();
       this.bgmCtx = resources.bgm.sound.context.audioContext;
@@ -323,12 +355,10 @@ export default class EggTap {
     for (let child of this.app.stage.children) {
       child.off('pointerover');
       child.off('pointerdown');
-      // child.off('pointerenter');
-      // child.off('touchmove');
-      // child.off('touchend');
-      // child.off('touchstart');
     }
-    // this.appWrapper.removeEventListener('mouseup');
-    // this.appWrapper.removeEventListener('mousedown');
+
+    // remove all listeners of parent
+    let newWrapper = this.appWrapper.cloneNode(true);
+    this.appWrapper.parentNode.replaceChild(newWrapper, this.appWrapper);
   }
 }
