@@ -237,6 +237,8 @@
                     throw new Error('fail to get parent node');
                 // Resize the renderer
                 _this.app.renderer.resize(_this.appWrapper.clientWidth, _this.appWrapper.clientHeight);
+                _this.app.renderer.view.style.width = _this.appWrapper.clientWidth + 'px';
+                _this.app.renderer.view.style.height = _this.appWrapper.clientHeight + 'px';
                 // You can use the 'screen' property as the renderer visible
                 // area, this is more useful than view.width/height because
                 // it handles resolution
