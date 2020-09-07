@@ -7,13 +7,12 @@
 1. Clone this repo
 2. npm install // dependencies
 3. npm run build // build
-4. ⚠️ npm run serve // serve (⚠️ not implemented yet)
+4. npm run dev // live server with change detection (template.html is not watched)
 ```
 
 #### 🙈 todo
-- [ ] loading display
+- [x] loading display
 - [x] auto adjust on window resizing
-- [ ] live server plugin for development
+- [x] live server plugin for development
 - [ ] Add more animations
 - [ ] Figure out how to match throttle with bpm
-- [ ] Static exclude from build

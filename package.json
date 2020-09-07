@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c --environment INCLUDE_DEPS,BUILD:production",
+    "dev": "rollup -c -w",
     "deploy": "gh-pages -d build"
   },
   "repository": {
@@ -28,6 +29,8 @@
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-generate-html-template": "^1.7.0",
     "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-serve": "^1.0.4",
+    "rollup-watch": "^4.3.1",
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
   },

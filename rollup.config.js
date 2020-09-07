@@ -3,6 +3,7 @@ import url from '@rollup/plugin-url';
 import commonjs from "rollup-plugin-commonjs";
 import resolve from 'rollup-plugin-node-resolve';
 import htmlTemplate from 'rollup-plugin-generate-html-template';
+import serve from 'rollup-plugin-serve';
 
 import pkg from "./package.json";
 
@@ -18,7 +19,7 @@ export default {
     },
   },
   external: [
-    'pixi.js', 
+    'pixi.js',
     'pixi-sound',
     'pixi-layers',
     '@pixi/graphics-extras',
@@ -41,5 +42,12 @@ export default {
       template: 'template.html',
       target: 'build/index.html',
     }),
-  ]
+    serve('build')
+  ],
+  watch: {
+    chokidar: true,
+    // include and exclude govern which files to watch. by
+    // default, all dependencies will be watched
+    exclude: ['node_modules/**']
+  }
 };
