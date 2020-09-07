@@ -14,9 +14,11 @@ enum Layout {
 
 export default class EggTap {
   app: PIXI.Application | null;
+  uiGroup: PIXI.display.Group | null;
   topGroup: PIXI.display.Group | null;
   midGroup: PIXI.display.Group | null;
   botGroup: PIXI.display.Group | null;
+  uiLayer: PIXI.display.Layer | null;
   topLayer: PIXI.display.Layer | null;
   midLayer: PIXI.display.Layer | null;
   botLayer: PIXI.display.Layer | null;
@@ -52,6 +54,7 @@ export default class EggTap {
     this.topGroup = null;
     this.midGroup = null;
     this.botGroup = null;
+    this.uiLayer = null;
     this.topLayer = null;
     this.midLayer = null;
     this.botLayer = null;
@@ -72,7 +75,9 @@ export default class EggTap {
   async _init() {
     this._initApp();
     this._initView();
+    this._bindEvent();
     this._initAutoResize();
+    this._intiLoadingScreen();
     this._initAudios();
     this._initBackground();
   }
@@ -82,8 +87,9 @@ export default class EggTap {
       autoDensity: true,
       resolution: devicePixelRatio
     });
+  }
 
-    // event
+  _bindEvent() {
     this.appWrapper.addEventListener('mousedown', () => {
       this.isPressed = true;
     })
@@ -107,14 +113,17 @@ export default class EggTap {
     this.app.stage = new PIXI.display.Stage();
     this.app.stage.sortableChildren = true;
 
+    this.uiGroup = new PIXI.display.Group(3, false);
     this.topGroup = new PIXI.display.Group(2, false);
     this.midGroup = new PIXI.display.Group(1, false);
     this.botGroup = new PIXI.display.Group(-1, false);
 
+    this.uiLayer = new PIXI.display.Layer(this.uiGroup);
     this.topLayer = new PIXI.display.Layer(this.topGroup);
     this.midLayer = new PIXI.display.Layer(this.midGroup);
     this.botLayer = new PIXI.display.Layer(this.botGroup);
 
+    this.app.stage.addChild(this.uiLayer);
     this.app.stage.addChild(this.topLayer);
     this.app.stage.addChild(this.midLayer);
     this.app.stage.addChild(this.botLayer);
@@ -122,7 +131,7 @@ export default class EggTap {
 
   _initBackground() {
     if (!this.app) throw new Error('fail to get app instance');
-    
+
     // reset
     if (this.appBackground) {
       this.app.stage.removeChild(this.appBackground);
@@ -131,7 +140,7 @@ export default class EggTap {
     this.appBackground = new PIXI.Graphics()
       .beginFill(this.colors[this.currentBgColorIndex], 1)
       .drawRegularPolygon(0, 0, 2 * Math.max(this.app.screen.width, this.app.screen.height), 4, 0);
-    
+
     // seems there is no displayGroup specified
     (this.appBackground as any).displayGroup = this.botGroup;
     this.app.stage.addChild(this.appBackground)
@@ -196,7 +205,7 @@ export default class EggTap {
       row = 8;
       col = 4;
     }
-    
+
     // tapper size
     const width = this.appWrapper.clientWidth / col;
     const height = this.appWrapper.clientHeight / row;
@@ -296,7 +305,7 @@ export default class EggTap {
   _drawBackground() {
     let seed = Math.floor(Math.random() * this.colors.length);
 
-    if (seed !== Math.floor(Math.random() * this.colors.length)) return;
+    if (0 !== Math.floor(Math.random() * 10)) return;
     const heading = Math.random();
     const radius = Math.max(
       this.appWrapper.clientWidth,
@@ -333,6 +342,61 @@ export default class EggTap {
     });
 
     (this.app as PIXI.Application).stage.addChild(bg);
+  }
+
+
+  _intiLoadingScreen() {
+    let loaded = 0;
+    // +1 is the bgm
+    let totalResourcesNum = Object.keys(this.audioSlices).length + 1;
+    let step = this.appWrapper.clientWidth / totalResourcesNum;
+    const progressBar = new PIXI.Graphics()
+      .beginFill(0xffffff, 1)
+      .drawRect(
+        -this.appWrapper.clientWidth,
+        this.appWrapper.clientHeight / 2,
+        this.appWrapper.clientWidth,
+        10);
+
+    const style = new PIXI.TextStyle({
+      fontWeight: 'lighter',
+      fill: '#fff',
+      fontSize: 24
+    });
+    const text = new PIXI.Text('Loading', style);
+    text.x = this.appWrapper.clientWidth / 2 - 40;
+    text.y = this.appWrapper.clientHeight / 2 - 40;
+
+    TweenLite.to([text, progressBar], .5, {
+      alpha: 0.4,
+      yoyo: true,
+      repeat: -1,
+      delay: 0.4
+    });
+
+    progressBar.parentGroup = this.uiGroup as PIXI.display.Group;
+    text.parentGroup = this.uiGroup as PIXI.display.Group;
+
+    (this.app as PIXI.Application).stage.addChild(progressBar);
+    (this.app as PIXI.Application).stage.addChild(text);
+
+    PIXI.Loader.shared.onProgress.add(async () => {
+      loaded++;
+      const length = step * loaded;
+      TweenLite.to(progressBar, .5, {
+        x: length,
+      });
+
+      if (loaded === totalResourcesNum) {
+        TweenLite.to([progressBar, text], .5, {
+          alpha: 0,
+          onComplete: () => {
+            (this.app as PIXI.Application).stage.removeChild(progressBar);
+            (this.app as PIXI.Application).stage.removeChild(text);
+          }
+        });
+      }
+    });
   }
 
   async _initAudios() {
