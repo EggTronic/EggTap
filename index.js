@@ -148,6 +148,7 @@
             this.topGroup = null;
             this.midGroup = null;
             this.botGroup = null;
+            this.uiLayer = null;
             this.topLayer = null;
             this.midLayer = null;
             this.botLayer = null;
@@ -169,7 +170,9 @@
                 return __generator(this, function (_a) {
                     this._initApp();
                     this._initView();
+                    this._bindEvent();
                     this._initAutoResize();
+                    this._intiLoadingScreen();
                     this._initAudios();
                     this._initBackground();
                     return [2 /*return*/];
@@ -177,12 +180,13 @@
             });
         };
         EggTap.prototype._initApp = function () {
-            var _this = this;
             this.app = new PIXI.Application({
                 autoDensity: true,
                 resolution: devicePixelRatio
             });
-            // event
+        };
+        EggTap.prototype._bindEvent = function () {
+            var _this = this;
             this.appWrapper.addEventListener('mousedown', function () {
                 _this.isPressed = true;
             });
@@ -202,12 +206,15 @@
             this.appWrapper.appendChild(this.app.view);
             this.app.stage = new PIXI.display.Stage();
             this.app.stage.sortableChildren = true;
+            this.uiGroup = new PIXI.display.Group(3, false);
             this.topGroup = new PIXI.display.Group(2, false);
             this.midGroup = new PIXI.display.Group(1, false);
             this.botGroup = new PIXI.display.Group(-1, false);
+            this.uiLayer = new PIXI.display.Layer(this.uiGroup);
             this.topLayer = new PIXI.display.Layer(this.topGroup);
             this.midLayer = new PIXI.display.Layer(this.midGroup);
             this.botLayer = new PIXI.display.Layer(this.botGroup);
+            this.app.stage.addChild(this.uiLayer);
             this.app.stage.addChild(this.topLayer);
             this.app.stage.addChild(this.midLayer);
             this.app.stage.addChild(this.botLayer);
@@ -370,7 +377,7 @@
         EggTap.prototype._drawBackground = function () {
             var _this = this;
             var seed = Math.floor(Math.random() * this.colors.length);
-            if (seed !== Math.floor(Math.random() * this.colors.length))
+            if (0 !== Math.floor(Math.random() * 10))
                 return;
             var heading = Math.random();
             var radius = Math.max(this.appWrapper.clientWidth, this.appWrapper.clientHeight);
@@ -396,6 +403,55 @@
                 }
             });
             this.app.stage.addChild(bg);
+        };
+        EggTap.prototype._intiLoadingScreen = function () {
+            var _this = this;
+            var loaded = 0;
+            // +1 is the bgm
+            var totalResourcesNum = Object.keys(this.audioSlices).length + 1;
+            var step = this.appWrapper.clientWidth / totalResourcesNum;
+            var progressBar = new PIXI.Graphics()
+                .beginFill(0xffffff, 1)
+                .drawRect(-this.appWrapper.clientWidth, this.appWrapper.clientHeight / 2, this.appWrapper.clientWidth, 10);
+            var style = new PIXI.TextStyle({
+                fontWeight: 'lighter',
+                fill: '#fff',
+                fontSize: 24
+            });
+            var text = new PIXI.Text('Loading', style);
+            text.x = this.appWrapper.clientWidth / 2 - 40;
+            text.y = this.appWrapper.clientHeight / 2 - 40;
+            TweenLite.to([text, progressBar], .5, {
+                alpha: 0.4,
+                yoyo: true,
+                repeat: -1,
+                delay: 0.4
+            });
+            progressBar.parentGroup = this.uiGroup;
+            text.parentGroup = this.uiGroup;
+            this.app.stage.addChild(progressBar);
+            this.app.stage.addChild(text);
+            PIXI.Loader.shared.onProgress.add(function () { return __awaiter(_this, void 0, void 0, function () {
+                var length;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    loaded++;
+                    length = step * loaded;
+                    TweenLite.to(progressBar, .5, {
+                        x: length,
+                    });
+                    if (loaded === totalResourcesNum) {
+                        TweenLite.to([progressBar, text], .5, {
+                            alpha: 0,
+                            onComplete: function () {
+                                _this.app.stage.removeChild(progressBar);
+                                _this.app.stage.removeChild(text);
+                            }
+                        });
+                    }
+                    return [2 /*return*/];
+                });
+            }); });
         };
         EggTap.prototype._initAudios = function () {
             return __awaiter(this, void 0, void 0, function () {
@@ -490,7 +546,13 @@
         0x888899,
         0xEC5685,
         0x8AD9EC,
-        0x109FB1
+        0x109FB1,
+        0x9CCFE7,
+        0x977FD7,
+        0xF5A9CB,
+        0xFFFFC2,
+        0xFA6D6F,
+        0xFA8F6F
     ];
 
     var EggTapAudioSlices = audioSlices;
