@@ -37,6 +37,7 @@ export default class EggTap {
   currentTime: number;
   offset: number;
   interval: number;
+  currentDispatch: null | NodeJS.Timeout;
   bgmCtx: null | AudioContext;
   constructor(
     wrapper: string,
@@ -66,8 +67,9 @@ export default class EggTap {
     this.isPressed = false;
     this.layout = Layout.Landscape;
     this.currentTime = 0;
-    this.offset = -0.56;
-    this.interval = 0.125 / 2;
+    this.offset = 0;
+    this.interval = 125 * 2;
+    this.currentDispatch = null;
     this.bgmCtx = null;
     this._init();
   }
@@ -234,25 +236,34 @@ export default class EggTap {
           TweenLite.to(tapper, .05, { alpha: 1 });
           TweenLite.to(tapper, .6, { delay: 0.05, alpha: 0 });
 
-          // throttle
-          if (!this._throttle()) return;
+          // cb for debounce
+          const dispatch = () => {
+            // fire sound
+            this._dispatchSound(target);
 
-          // fire sound
-          this._dispatchSound(target);
+            // draw background
+            this._drawBackground();
 
-          // draw background
-          this._drawBackground();
+            // fire animation
+            this.currentColorIndex++;
+            if (this.currentColorIndex > this.colors.length - 1) this.currentColorIndex = this.currentColorIndex % this.colors.length;
+            this.animations[(r + c) % 2]({
+              app: this.app,
+              group: this.midGroup,
+              colors: this.colors,
+              currentColorIndex: this.currentColorIndex
+            });
 
-          // fire animation
-          this.currentColorIndex++;
-          if (this.currentColorIndex > this.colors.length - 1) this.currentColorIndex = this.currentColorIndex % this.colors.length;
-          this.animations[(r + c) % 2]({
-            app: this.app,
-            group: this.midGroup,
-            colors: this.colors,
-            currentColorIndex: this.currentColorIndex
-          });
+            this.currentDispatch = null;
+          }
 
+          // debounce to auido bpm
+          let timeSnapshot = Math.floor((this.bgmCtx as AudioContext).currentTime * 1000) + this.offset;
+          let gap = this.interval - timeSnapshot % this.interval;
+          console.log(gap, timeSnapshot);
+          if (!this.currentDispatch) {
+            this.currentDispatch = setTimeout(dispatch, gap);
+          }
         };
 
         tapper.on('pointerover', (e: any) => draw(false, e));
@@ -266,35 +277,6 @@ export default class EggTap {
         (this.app as PIXI.Application).stage.addChild(tapper);
       }
     }
-  }
-
-  _throttle() {
-    // throttle
-    let timeSnapshot = (this.bgmCtx as AudioContext).currentTime + this.offset;
-
-    if ((timeSnapshot - this.currentTime) < this.interval) return false;
-
-    this.currentTime = timeSnapshot + this.interval;
-    return true;
-    // // get current time
-    // let time = (this.bgmCtx.currentTime + this.offset).toFixed(3);
-
-    // // calculate currenTtime to match interval
-    // let sec = Math.floor(time);
-    // let msec = time - sec;
-
-    // if (msec === 0) {
-    //   this.currentTime = sec;
-    //   return true;
-    // }
-
-    // for (let i = 1; i <= 1 / this.interval; i++) {
-    //   if (Math.abs(msec - i * this.interval) < this.interval / 2) {
-    //     // this.currentTime = sec + i * this.interval;
-    //     this.currentTime = time;
-    //     return true;
-    //   }
-    // }
   }
 
   _dispatchSound(target: string) {

@@ -4,10 +4,14 @@
 ---
 #### 🔨 Development
 ```
-1. Clone this repo
+1. Fork and clone this repo to your local
 2. npm install // dependencies
 3. npm run build // build
 4. npm run dev // live server with change detection (template.html is not watched)
+```
+
+#### 🧡 Usage
+```
 ```
 
 #### 🙈 todo
