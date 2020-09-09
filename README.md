@@ -15,8 +15,9 @@
 ```
 
 #### 🙈 todo
+- [ ] Add more animations
+- [ ] Audio quality improve (length & audio)
 - [x] loading display
 - [x] auto adjust on window resizing
 - [x] live server plugin for development
-- [ ] Add more animations
 - [x] Figure out how to match throttle with bpm
