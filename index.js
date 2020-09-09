@@ -57,7 +57,7 @@
         }
     }
 
-    var bgm = "72eb1fb86aa8487f.mp3";
+    var bgm = "64707256e3507649.mp3";
 
     var k1 = "9fbdb59ab046d06c.wav";
 
@@ -138,7 +138,8 @@
         Layout[Layout["Landscape"] = 1] = "Landscape";
     })(Layout || (Layout = {}));
     var EggTap = /** @class */ (function () {
-        function EggTap(wrapper, colors, animations, customAudiosSlices, customBgm) {
+        function EggTap(wrapper, colors, animations, customAudiosSlices, customBgm, offset, // audio start position offset
+        interval) {
             this.appWrapper = document.getElementById(wrapper);
             this.colors = colors;
             this.animations = animations;
@@ -160,8 +161,9 @@
             this.isPressed = false;
             this.layout = Layout.Landscape;
             this.currentTime = 0;
-            this.offset = -0.56;
-            this.interval = 0.125 / 2;
+            this.offset = offset ? offset : 0;
+            this.interval = interval ? interval : 125 * 2;
+            this.currentDispatch = null;
             this.bgmCtx = null;
             this._init();
         }
@@ -311,23 +313,30 @@
                         // click flash animation
                         TweenLite.to(tapper, .05, { alpha: 1 });
                         TweenLite.to(tapper, .6, { delay: 0.05, alpha: 0 });
-                        // throttle
-                        if (!_this._throttle())
-                            return;
-                        // fire sound
-                        _this._dispatchSound(target);
-                        // draw background
-                        _this._drawBackground();
-                        // fire animation
-                        _this.currentColorIndex++;
-                        if (_this.currentColorIndex > _this.colors.length - 1)
-                            _this.currentColorIndex = _this.currentColorIndex % _this.colors.length;
-                        _this.animations[(r + c) % 2]({
-                            app: _this.app,
-                            group: _this.midGroup,
-                            colors: _this.colors,
-                            currentColorIndex: _this.currentColorIndex
-                        });
+                        // cb for debounce
+                        var dispatch = function () {
+                            // fire sound
+                            _this._dispatchSound(target);
+                            // draw background
+                            _this._drawBackground();
+                            // fire animation
+                            _this.currentColorIndex++;
+                            if (_this.currentColorIndex > _this.colors.length - 1)
+                                _this.currentColorIndex = _this.currentColorIndex % _this.colors.length;
+                            _this.animations[(r + c) % 2]({
+                                app: _this.app,
+                                group: _this.midGroup,
+                                colors: _this.colors,
+                                currentColorIndex: _this.currentColorIndex
+                            });
+                            _this.currentDispatch = null;
+                        };
+                        // debounce to auido bpm
+                        var timeSnapshot = Math.floor(_this.bgmCtx.currentTime * 1000) + _this.offset;
+                        var gap = _this.interval - timeSnapshot % _this.interval;
+                        if (!_this.currentDispatch) {
+                            _this.currentDispatch = setTimeout(dispatch, gap);
+                        }
                     };
                     tapper.on('pointerover', function (e) { return draw(false, e); });
                     tapper.on('pointerdown', function (e) { return draw(true, e); });
@@ -345,30 +354,6 @@
             for (var r = 0; r < row; r++) {
                 _loop_1(r);
             }
-        };
-        EggTap.prototype._throttle = function () {
-            // throttle
-            var timeSnapshot = this.bgmCtx.currentTime + this.offset;
-            if ((timeSnapshot - this.currentTime) < this.interval)
-                return false;
-            this.currentTime = timeSnapshot + this.interval;
-            return true;
-            // // get current time
-            // let time = (this.bgmCtx.currentTime + this.offset).toFixed(3);
-            // // calculate currenTtime to match interval
-            // let sec = Math.floor(time);
-            // let msec = time - sec;
-            // if (msec === 0) {
-            //   this.currentTime = sec;
-            //   return true;
-            // }
-            // for (let i = 1; i <= 1 / this.interval; i++) {
-            //   if (Math.abs(msec - i * this.interval) < this.interval / 2) {
-            //     // this.currentTime = sec + i * this.interval;
-            //     this.currentTime = time;
-            //     return true;
-            //   }
-            // }
         };
         EggTap.prototype._dispatchSound = function (target) {
             // playsound
