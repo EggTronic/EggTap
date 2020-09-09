@@ -19,4 +19,4 @@
 - [x] auto adjust on window resizing
 - [x] live server plugin for development
 - [ ] Add more animations
-- [ ] Figure out how to match throttle with bpm
+- [x] Figure out how to match throttle with bpm

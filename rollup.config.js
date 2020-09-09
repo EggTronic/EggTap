@@ -42,7 +42,7 @@ export default {
       template: 'template.html',
       target: 'build/index.html',
     }),
-    serve('build')
+    process.env.BUILD === 'production' ? null : serve('build')
   ],
   watch: {
     chokidar: true,

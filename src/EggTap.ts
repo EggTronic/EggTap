@@ -44,7 +44,9 @@ export default class EggTap {
     colors: number[],
     animations: (({ ...AnimationProps }) => void)[],
     customAudiosSlices?: AudioSlices,
-    customBgm?: string
+    customBgm?: string,
+    offset?: number, // audio start position offset
+    interval?: number, // interval between each tap
   ) {
     this.appWrapper = document.getElementById(wrapper);
     this.colors = colors;
@@ -67,8 +69,8 @@ export default class EggTap {
     this.isPressed = false;
     this.layout = Layout.Landscape;
     this.currentTime = 0;
-    this.offset = 0;
-    this.interval = 125 * 2;
+    this.offset = offset ? offset : 0;
+    this.interval = interval ? interval : 125 * 2;
     this.currentDispatch = null;
     this.bgmCtx = null;
     this._init();
