@@ -260,7 +260,7 @@ export default class EggTap {
           // debounce to auido bpm
           let timeSnapshot = Math.floor((this.bgmCtx as AudioContext).currentTime * 1000) + this.offset;
           let gap = this.interval - timeSnapshot % this.interval;
-          console.log(gap, timeSnapshot);
+
           if (!this.currentDispatch) {
             this.currentDispatch = setTimeout(dispatch, gap);
           }
