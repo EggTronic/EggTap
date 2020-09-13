@@ -323,7 +323,7 @@
                             _this.currentColorIndex++;
                             if (_this.currentColorIndex > _this.colors.length - 1)
                                 _this.currentColorIndex = _this.currentColorIndex % _this.colors.length;
-                            _this.animations[(r + c) % 2]({
+                            _this.animations[(r + c) % _this.animations.length]({
                                 app: _this.app,
                                 group: _this.midGroup,
                                 colors: _this.colors,
@@ -496,7 +496,7 @@
     };
     var a2 = function (_a) {
         var app = _a.app, group = _a.group, colors = _a.colors, currentColorIndex = _a.currentColorIndex;
-        var nums = 20;
+        var nums = 10;
         var _loop_1 = function () {
             var shape = new PIXI.Graphics()
                 .beginFill(colors[currentColorIndex])
@@ -504,12 +504,20 @@
             shape.x = app.screen.width / 2;
             shape.y = app.screen.height / 2;
             shape.parentGroup = group;
-            TweenLite.to(shape, 0.5, {
+            var tl = new TimelineLite();
+            tl.to(shape, 0.5, {
                 x: Math.random() * app.screen.width,
                 y: Math.random() * app.screen.height,
                 width: shape.width * 20,
                 height: shape.height * 20,
-                rotation: Math.random() * 2 * Math.PI,
+                rotation: (2 - Math.random() * 4) * Math.PI,
+            });
+            tl.to(shape, 1, {
+                x: Math.random() * app.screen.width,
+                y: Math.random() * app.screen.height,
+                width: 0,
+                height: 0,
+                rotation: (5 - Math.random() * 10) * Math.PI,
                 onComplete: function () {
                     app.stage.removeChild(shape);
                 }
@@ -520,7 +528,64 @@
             _loop_1();
         }
     };
-    var EggTapAnimations = [a1, a2];
+    var a3 = function (_a) {
+        var app = _a.app, group = _a.group, colors = _a.colors, currentColorIndex = _a.currentColorIndex;
+        var shape = new PIXI.Graphics()
+            .lineStyle(0.5, colors[currentColorIndex])
+            .drawRegularPolygon(0, 0, 11, Math.random() * 10 + 3, 2);
+        shape.x = app.screen.width / 2;
+        shape.y = app.screen.height / 2;
+        shape.parentGroup = group;
+        var tl = new TimelineLite();
+        tl.to(shape, 0.5, {
+            width: shape.width * 50,
+            height: shape.height * 50,
+            rotation: (Math.random() - 0.5) * 2 * Math.PI,
+        });
+        tl.to(shape, 1, {
+            width: 0,
+            height: 0,
+            onComplete: function () {
+                app.stage.removeChild(shape);
+            }
+        });
+        app.stage.addChild(shape);
+    };
+    var a4 = function (_a) {
+        var app = _a.app, group = _a.group, colors = _a.colors, currentColorIndex = _a.currentColorIndex;
+        var nums = 10;
+        var _loop_2 = function () {
+            var shape = new PIXI.Graphics()
+                .beginFill(colors[currentColorIndex])
+                .drawCircle(0, 0, 0.5 + Math.random() * 0.5);
+            shape.x = app.screen.width / 2;
+            shape.y = app.screen.height / 2;
+            shape.parentGroup = group;
+            var tl = new TimelineLite();
+            tl.to(shape, 0.5, {
+                x: Math.random() * app.screen.width,
+                y: Math.random() * app.screen.height,
+                width: shape.width * 20,
+                height: shape.height * 20,
+            });
+            tl.to(shape, 0.6, {
+                width: 1.5,
+                height: 1.5
+            });
+            tl.to(shape, 1, {
+                width: 0,
+                height: 0,
+                onComplete: function () {
+                    app.stage.removeChild(shape);
+                }
+            });
+            app.stage.addChild(shape);
+        };
+        while (nums--) {
+            _loop_2();
+        }
+    };
+    var EggTapAnimations = [a1, a2, a3, a4];
 
     var colors = [
         0x88CCCC,
