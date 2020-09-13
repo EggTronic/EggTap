@@ -249,7 +249,7 @@ export default class EggTap {
             // fire animation
             this.currentColorIndex++;
             if (this.currentColorIndex > this.colors.length - 1) this.currentColorIndex = this.currentColorIndex % this.colors.length;
-            this.animations[(r + c) % 2]({
+            this.animations[(r + c) % this.animations.length]({
               app: this.app,
               group: this.midGroup,
               colors: this.colors,
