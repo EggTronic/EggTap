@@ -70,7 +70,7 @@ export default class EggTap {
     this.layout = Layout.Landscape;
     this.currentTime = 0;
     this.offset = offset ? offset : 0;
-    this.interval = interval ? interval : 125 * 2;
+    this.interval = interval ? interval : 125/2;
     this.currentDispatch = null;
     this.bgmCtx = null;
     this._init();
