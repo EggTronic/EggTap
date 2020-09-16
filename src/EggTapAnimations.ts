@@ -118,6 +118,39 @@ const a4 = ({ app, group, colors, currentColorIndex }: AnimationProps) => {
   }
 };
 
-const EggTapAnimations = [a1, a2, a3, a4];
+const a5 = ({ app, group, colors, currentColorIndex }: AnimationProps) => {
+  let seed = Math.floor(Math.random() * 3) + 13;
+  let nums = seed;
+  let width = app.screen.width / 6;
+  let height = 40;
+  let angle = 2 * Math.PI;
+  while (nums--) {
+    const shape = new PIXI.Graphics()
+      .beginFill(colors[currentColorIndex])
+      .drawRect(-width / 2, - 2 * height + height * 2 * nums, 50, height)
+    shape.x = app.screen.width / 2;
+    shape.y = app.screen.height / 2;
+    shape.parentGroup = group;
+
+    const tl = new TimelineLite();
+
+    tl.to(shape, 0.1 * (6 - nums), {
+      width: width,
+      height: height,
+      rotation: nums / seed * angle + (Math.random() - 0.5) * 2 * Math.PI
+    });
+    tl.to(shape, 0.6, {
+      width: 0,
+      rotation: (Math.random() - 0.5) * 2 * Math.PI,
+      onComplete: () => {
+        app.stage.removeChild(shape);
+      }
+    });
+
+    app.stage.addChild(shape);
+  }
+};
+
+const EggTapAnimations = [a1, a2, a3, a4, a5];
 
 export default EggTapAnimations;
