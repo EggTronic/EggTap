@@ -585,7 +585,40 @@
             _loop_2();
         }
     };
-    var EggTapAnimations = [a1, a2, a3, a4];
+    var a5 = function (_a) {
+        var app = _a.app, group = _a.group, colors = _a.colors, currentColorIndex = _a.currentColorIndex;
+        var seed = Math.floor(Math.random() * 3) + 13;
+        var nums = seed;
+        var width = app.screen.width / 6;
+        var height = 40;
+        var angle = 2 * Math.PI;
+        var _loop_3 = function () {
+            var shape = new PIXI.Graphics()
+                .beginFill(colors[currentColorIndex])
+                .drawRect(-width / 2, -2 * height + height * 2 * nums, 50, height);
+            shape.x = app.screen.width / 2;
+            shape.y = app.screen.height / 2;
+            shape.parentGroup = group;
+            var tl = new TimelineLite();
+            tl.to(shape, 0.1 * (6 - nums), {
+                width: width,
+                height: height,
+                rotation: nums / seed * angle + (Math.random() - 0.5) * 2 * Math.PI
+            });
+            tl.to(shape, 0.6, {
+                width: 0,
+                rotation: (Math.random() - 0.5) * 2 * Math.PI,
+                onComplete: function () {
+                    app.stage.removeChild(shape);
+                }
+            });
+            app.stage.addChild(shape);
+        };
+        while (nums--) {
+            _loop_3();
+        }
+    };
+    var EggTapAnimations = [a1, a2, a3, a4, a5];
 
     var colors = [
         0x88CCCC,
